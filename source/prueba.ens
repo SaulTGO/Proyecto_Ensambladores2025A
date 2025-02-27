@@ -1,0 +1,34 @@
+.MODEL SMALL
+.STACK SEGMENT
+12 DUP(0)
+.DATA
+    mensaje DB "Hola, Mundo en Ensamblador!"
+    numero1 DW 25
+    numero2 DW 10
+    resultado DW ?
+
+.CODE SEGMENT
+    MOV AX, @DATA
+    MOV DS, AX
+
+    MOV AX, numero1
+    ADD AX, numero2
+    MOV resultado, AX
+
+    CMP AX, 30
+    JL menor
+
+    LEA DX, mensaje
+    MOV AH, 9
+    INT 21h
+    JMP fin
+
+menor:
+
+    MOV AX, 0
+
+fin:
+    MOV AH, 4Ch
+    INT 21h
+
+END
