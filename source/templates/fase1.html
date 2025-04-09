@@ -2,15 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/assets/css/fase1.css">
     <title>Fase 1</title>
 </head>
 <body>
+<header>
     <h1>Fase 1</h1>
-    <div>
-        <form enctype="multipart/form-data" method="post" action="/Fase1">
-            <input type="file" name="uploaded" accept=".ens">
-            <button type="submit">Subir archivo</button>
+</header>
+
+<div class="container">
+    <div class="upload-section">
+        <form class="upload-form" enctype="multipart/form-data" method="post" action="/Fase1">
+            <div class="file-input-wrapper">
+                <label class="file-input-label" for="file-upload">
+                    Arrastra tu archivo .ens aquí o haz clic para seleccionar
+                    <input id="file-upload" class="file-input" type="file" name="uploaded" accept=".*" onchange="updateFileName(this)">
+                </label>
+                <div id="file-name" class="file-name">Ningún archivo seleccionado</div>
+            </div>
+            <button class="submit-button" type="submit">Subir archivo</button>
         </form>
     </div>
+
+    {{if .FileProcessed}}
+    <div class="tables-container">
+        <div class="table-section">
+            <h3 class="table-title">Código fuente</h3>
+            <table>
+                {{range .SourceCode}}
+                <tr>
+                    <th>{{ . }}</th>
+                </tr>
+                {{end}}
+            </table>
+        </div>
+
+        <div class="table-section">
+            <h3 class="table-title">Separación de elementos</h3>
+            <table>
+                <tr>
+                    <th>Elemento</th>
+                    <th>Clasificación</th>
+                </tr>
+                {{range .InstructionsSlice}}
+                <tr>
+                    <th>{{ .Name }}</th>
+                    <th>{{ .Classification }}</th>
+                </tr>
+                {{ end }}
+            </table>
+        </div>
+    </div>
+    {{end}}
+</div>
+
+<script>
+    function updateFileName(input) {
+        document.getElementById('file-name').textContent = input.files[0] ? input.files[0].name : 'Ningún archivo seleccionado';
+    }
+</script>
 </body>
 </html>

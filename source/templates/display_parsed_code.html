@@ -7,7 +7,18 @@
 <body>
   <div>
     <h2>Codigo analizado</h2>
-    {{ . }}
+    <table>
+        <tr>
+            <th>Elemento</th>
+            <th>Clasificacion</th>
+        </tr>
+        {{ range . }}
+        <tr>
+            <th>{{ .Name }}</th>
+            <th>{{ .Classification }}</th>
+        </tr>
+        {{ end }}
+    </table>
   </div>
 </body>
 </html>

@@ -5,16 +5,23 @@
     <link rel="stylesheet" type="text/css" href="/assets/css/display_source_code.css">
     <title>Something</title>
 </head>
-<body>
+<body style="display:contents;">
     <div>
         <h1>Codigo fuente</h1>
-        <ul>
+        <table>
+            <tr>
+                <th>
+                    Lineas
+                </th>
+            </tr>
             {{ range . }}
-            <li>{{ . }}</li>
-            {{ else }}
-            <li> Nothing to show </li>
-            {{ end}}
-        </ul>
+            <tr>
+                <th>
+                    {{ . }}
+                </th>
+            </tr>
+            {{ end }}
+        </table>
     </div>
 </body>
 </html>
