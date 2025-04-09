@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -16,7 +17,7 @@ func main() {
 
 	fs := http.FileServer(http.Dir("assets"))
 	http.Handle("/assets/", http.StripPrefix("/assets", fs))
-	
+
 	server := http.Server{
 		Addr: "127.0.0.1:8080",
 	}
@@ -26,6 +27,11 @@ func main() {
 	http.HandleFunc("/Fase2", ServeFase1)
 	http.HandleFunc("/Fase3", ServeFase1)
 
-	log.Fatal(server.ListenAndServe())
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		fmt.Println("Servidor en: http://127.0.0.1:8080")
+	}
 
 }

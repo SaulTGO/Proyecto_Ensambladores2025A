@@ -2,8 +2,9 @@
 .STACK SEGMENT
 12 DUP(0)
 .DATA
-    mensaje DB "Hola, Mundo en Ensamblador!"
-    numero1 DW 25
+    mensaje DB "Hola, Mundo en Ensamblador!" ;Este es un comentario
+    mensaje2 DB 'Hola soy un variable uwu'
+    numero1 DW 25                            ;Este es otro comentario
     numero2 DW 10
     resultado DW ?
 
