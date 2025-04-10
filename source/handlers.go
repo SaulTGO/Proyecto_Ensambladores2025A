@@ -73,10 +73,9 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 		scanner := bufio.NewScanner(file)
 
 		//Guardar cada linea del archivo
-		for i := 0; scanner.Scan(); i++ {
+		for i := 1; scanner.Scan(); i++ {
 			//Llenar la variable con las lineas de codigo
-
-			SourceCode = append(SourceCode, scanner.Text())
+			SourceCode[i] = scanner.Text()
 		}
 
 		//Verificar que el escaner haga su chamba

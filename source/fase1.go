@@ -1,13 +1,14 @@
 package main
 
 import (
+	"Assembler/references"
 	"Assembler/validations"
-	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
 
-func AnalizeSourceCode(sourceCode []string) {
+func AnalizeSourceCode(sourceCode map[int]string) {
 	//Remove comments and empty lines
 	ParsedSourceCode := removeComments(sourceCode)
 	ParsedSourceCode = removeEmptyLines(ParsedSourceCode)
@@ -15,47 +16,54 @@ func AnalizeSourceCode(sourceCode []string) {
 	classificateLines(ParsedSourceCode)
 }
 
-func classificateLines(parsedSourceCode []string) {
-	for lineNumber, line := range parsedSourceCode {
+func classificateLines(parsedSourceCode map[int]string) {
+	sortedKeys := SortKeys(parsedSourceCode)
+	elementNumber := 0
+	var elmNumber *int = &elementNumber
 
+	for _, k := range sortedKeys {
+		line := parsedSourceCode[k]
+		lineNumber := k
 		elements := splitLine(line)
 
 		for _, element := range elements {
-			tempInst := classificateElement(element, strconv.Itoa(lineNumber+1))
+			*elmNumber = *elmNumber + 1
+			tempInst := classificateElement(element, strconv.Itoa(lineNumber+1), elementNumber)
 			tempInst.AppendAsmInstruction()
 		}
 	}
 }
 
-func classificateElement(element string, lineNumber string) AsmInstruction {
+func classificateElement(element string, lineNumber string, elementNumber int) AsmInstruction {
 	if isSegment, seg := validations.CheckSegment(element); isSegment {
-		return SetAsmInstruction(element, seg, lineNumber)
+		return SetAsmInstruction(element, seg, lineNumber, elementNumber)
 	} else if isConstant, base := validations.CheckConstant(element); isConstant {
 		tempSlice := []string{"Constante", base}
-		return SetAsmInstruction(element, strings.Join(tempSlice, " "), lineNumber)
+		return SetAsmInstruction(element, strings.Join(tempSlice, " "), lineNumber, elementNumber)
 	} else if isInstruction, inst := validations.CheckInstruction(element); isInstruction {
-		return SetAsmInstruction(element, inst, lineNumber)
+		return SetAsmInstruction(element, inst, lineNumber, elementNumber)
 	} else if isRegister, reg := validations.CheckRegister(element); isRegister {
-		return SetAsmInstruction(element, reg, lineNumber)
+		return SetAsmInstruction(element, reg, lineNumber, elementNumber)
 	} else if isPseudoInstruction, psinst := validations.CheckPseudoInstruction(element); isPseudoInstruction {
-		return SetAsmInstruction(element, psinst, lineNumber)
+		return SetAsmInstruction(element, psinst, lineNumber, elementNumber)
+	} else if isInvalidInstruction, invInst := validations.CheckInvalidInstruction(element); isInvalidInstruction {
+		return SetAsmInstruction(element, invInst, lineNumber, elementNumber)
+	} else if isSimbol, symbol := validations.CheckSymbol(element); isSimbol {
+		return SetAsmInstruction(element, symbol, lineNumber, elementNumber)
 	}
-	return SetAsmInstruction(element, "No valido", lineNumber)
+	return SetAsmInstruction(element, "No valido", lineNumber, elementNumber)
 
 }
 
 func splitLine(line string) []string {
-	stringsPtrns := regexp.MustCompile(`("+(.)+")|('+(.)+')`)
-	segmentPtrns := regexp.MustCompile(`(?i)(code segment)|(?i)(data segment)|(?i)(stack segment)
-	|(?i)(\.code segment)|(?i)(\.data segment)|(?i)(\.stack segment)|(?i)(\.model small)`)
 	tempString := ""
 	var tempSlice []string
 
-	if stringsPtrns.MatchString(line) {
-		tempString = stringsPtrns.FindAllString(line, -1)[0]
+	if references.FullStringPtrn.MatchString(line) {
+		tempString = references.FullStringPtrn.FindAllString(line, -1)[0]
 		line = strings.Replace(line, tempString, "", -1)
 	}
-	if segmentPtrns.MatchString(line) {
+	if references.PseudoElementsPtrn.MatchString(line) {
 		return append(tempSlice, line)
 	}
 
@@ -63,9 +71,10 @@ func splitLine(line string) []string {
 	for i, element := range tempSlice {
 		tempSlice[i] = strings.TrimSpace(element)
 		tempSlice[i] = strings.TrimSuffix(tempSlice[i], ",")
+		tempSlice[i] = strings.TrimSuffix(tempSlice[i], ":")
 	}
 
-	tempSlice = removeEmptyLines(tempSlice)
+	tempSlice = removeSliceLines(tempSlice)
 	tempSlice = removeSliceSpaces(tempSlice)
 	if tempString != "" {
 		return append(tempSlice, tempString)
@@ -73,7 +82,7 @@ func splitLine(line string) []string {
 	return tempSlice
 }
 
-func removeComments(sourceCode []string) []string {
+func removeComments(sourceCode map[int]string) map[int]string {
 	for i, line := range sourceCode {
 		newLine := strings.Split(line, ";")[0]
 		sourceCode[i] = newLine
@@ -81,7 +90,7 @@ func removeComments(sourceCode []string) []string {
 	return sourceCode
 }
 
-func removeSpaces(sourceCode []string) []string {
+func removeSpaces(sourceCode map[int]string) map[int]string {
 	for i, line := range sourceCode {
 		newLine := strings.TrimSpace(line)
 		sourceCode[i] = newLine
@@ -89,11 +98,11 @@ func removeSpaces(sourceCode []string) []string {
 	return sourceCode
 }
 
-func removeEmptyLines(sourceCode []string) []string {
-	var r []string
-	for _, str := range sourceCode {
+func removeEmptyLines(sourceCode map[int]string) map[int]string {
+	var r = make(map[int]string)
+	for i, str := range sourceCode {
 		if str != "" {
-			r = append(r, str)
+			r[i+1] = str
 		}
 	}
 	return r
@@ -107,4 +116,23 @@ func removeSliceSpaces(parsedSourceCode []string) []string {
 		}
 	}
 	return r
+}
+
+func removeSliceLines(parsedSourceCode []string) []string {
+	var r []string
+	for _, str := range parsedSourceCode {
+		if str != "" {
+			r = append(r, str)
+		}
+	}
+	return r
+}
+
+func SortKeys(m map[int]string) []int {
+	keys := make([]int, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	return keys
 }
