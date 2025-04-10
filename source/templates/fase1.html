@@ -29,9 +29,14 @@
         <div class="table-section">
             <h3 class="table-title">Código fuente</h3>
             <table>
-                {{range .SourceCode}}
                 <tr>
-                    <th>{{ . }}</th>
+                    <th>Numero de linea</th>
+                    <th>Linea</th>
+                </tr>
+                {{ range $lineNumber, $line := .SourceCode }}
+                <tr>
+                    <th>{{ $lineNumber }}</th>
+                    <th>{{ $line }}</th>
                 </tr>
                 {{end}}
             </table>
@@ -41,11 +46,13 @@
             <h3 class="table-title">Separación de elementos</h3>
             <table>
                 <tr>
+                    <th># Elemento</th>
                     <th>Elemento</th>
                     <th>Clasificación</th>
                 </tr>
                 {{range .InstructionsSlice}}
                 <tr>
+                    <th>{{ .ElementNumber }}</th>
                     <th>{{ .Name }}</th>
                     <th>{{ .Classification }}</th>
                 </tr>
