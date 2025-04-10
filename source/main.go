@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -28,10 +27,8 @@ func main() {
 	http.HandleFunc("/Fase3", ServeFase1)
 
 	err := server.ListenAndServe()
+	println("Server ejecutandose en la direccion: ", server.Addr)
 	if err != nil {
 		log.Fatal(err)
-	} else {
-		fmt.Println("Servidor en: http://127.0.0.1:8080")
 	}
-
 }
