@@ -38,7 +38,7 @@ func checkBaseConstant(element string) string {
 }
 
 func CheckInstruction(element string) (bool, string) {
-	_, found := references.Instructions[element]
+	_, found := references.Instructions[strings.ToUpper(element)]
 	if found {
 		return true, "Instruccion"
 	}
@@ -46,7 +46,7 @@ func CheckInstruction(element string) (bool, string) {
 }
 
 func CheckRegister(element string) (bool, string) {
-	_, found := references.Registers16bits[element]
+	_, found := references.Registers16bits[strings.ToUpper(element)]
 	if found {
 		return true, "Registro"
 	} else if _, found := references.Registers8bits[element]; found {
@@ -56,8 +56,8 @@ func CheckRegister(element string) (bool, string) {
 }
 
 func CheckPseudoInstruction(element string) (bool, string) {
-	_, found := references.PseudoInstructions[element]
-	isPseudo := references.PseudoElementsPtrn.MatchString(element)
+	_, found := references.PseudoInstructions[strings.ToUpper(element)]
+	isPseudo := references.PseudoElementsPtrn.MatchString(strings.ToUpper(element))
 	if found || isPseudo {
 		return true, "PseudoInstruccion"
 	}
@@ -75,7 +75,7 @@ func CheckSegment(element string) (bool, string) {
 }
 
 func CheckInvalidInstruction(element string) (bool, string) {
-	_, found := references.InvalidInstructions[element]
+	_, found := references.InvalidInstructions[strings.ToUpper(element)]
 	if found {
 		return true, "No valido"
 	}
