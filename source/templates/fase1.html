@@ -15,7 +15,7 @@
         <form class="upload-form" enctype="multipart/form-data" method="post" action="/Fase1">
             <div class="file-input-wrapper">
                 <label class="file-input-label" for="file-upload">
-                    Arrastra tu archivo .ens aquí o haz clic para seleccionar
+                    Arrastra tu archivo aquí o haz clic para seleccionar
                     <input id="file-upload" class="file-input" type="file" name="uploaded" accept=".*" onchange="updateFileName(this)">
                 </label>
                 <div id="file-name" class="file-name">Ningún archivo seleccionado</div>
@@ -26,22 +26,29 @@
 
     {{if .FileProcessed}}
     <div class="tables-container">
+
+        <!-- Tabla Código Fuente -->
         <div class="table-section">
             <h3 class="table-title">Código fuente</h3>
             <table>
+                <thead>
                 <tr>
-                    <th>Numero de linea</th>
-                    <th>Linea</th>
+                    <th>Número de línea</th>
+                    <th>Línea</th>
                 </tr>
+                </thead>
+                <tbody>
                 {{ range $lineNumber, $line := .SourceCode }}
                 <tr>
-                    <th>{{ $lineNumber }}</th>
-                    <th>{{ $line }}</th>
+                    <td>{{ $lineNumber }}</td>
+                    <td>{{ $line }}</td>
                 </tr>
-                {{end}}
+                {{ end }}
+                </tbody>
             </table>
         </div>
 
+        <!-- Tabla Instrucciones -->
         <div class="table-section">
             <h3 class="table-title">Separación de elementos</h3>
             <table>
@@ -59,14 +66,77 @@
                 {{ end }}
             </table>
         </div>
+
     </div>
     {{end}}
 </div>
 
 <script>
-    function updateFileName(input) {
-        document.getElementById('file-name').textContent = input.files[0] ? input.files[0].name : 'Ningún archivo seleccionado';
-    }
+    document.addEventListener("DOMContentLoaded", function () {
+        function paginateTable(tableIndex, rowsPerPage) {
+            const table = document.querySelectorAll("table")[tableIndex].querySelector("tbody");
+            const rows = Array.from(table.querySelectorAll("tr"));
+            const paginationContainer = document.createElement("div");
+            paginationContainer.style.textAlign = "center";
+            paginationContainer.style.marginTop = "20px";
+            table.parentElement.appendChild(paginationContainer);
+
+            let currentPage = 1;
+            const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+            function showPage(page) {
+                const start = (page - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                rows.forEach((row, index) => {
+                    row.style.display = index >= start && index < end ? "" : "none";
+                });
+            }
+
+            function updatePagination() {
+                paginationContainer.innerHTML = "";
+                if (totalPages <= 1) return;
+
+                const prevButton = document.createElement("button");
+                prevButton.textContent = "Anterior";
+                prevButton.disabled = currentPage === 1;
+                prevButton.onclick = () => {
+                    currentPage--;
+                    showPage(currentPage);
+                    updatePagination();
+                };
+                paginationContainer.appendChild(prevButton);
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const btn = document.createElement("button");
+                    btn.textContent = i;
+                    btn.disabled = i === currentPage;
+                    btn.onclick = () => {
+                        currentPage = i;
+                        showPage(currentPage);
+                        updatePagination();
+                    };
+                    paginationContainer.appendChild(btn);
+                }
+
+                const nextButton = document.createElement("button");
+                nextButton.textContent = "Siguiente";
+                nextButton.disabled = currentPage === totalPages;
+                nextButton.onclick = () => {
+                    currentPage++;
+                    showPage(currentPage);
+                    updatePagination();
+                };
+                paginationContainer.appendChild(nextButton);
+            }
+
+            showPage(currentPage);
+            updatePagination();
+        }
+
+        paginateTable(0, 10);
+        paginateTable(1, 10);
+    });
 </script>
+
 </body>
 </html>
