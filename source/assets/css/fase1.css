@@ -4,6 +4,10 @@
     --dark-green: #1b5e20;
     --white: #ffffff;
     --light-gray: #f5f5f5;
+    --header-pastel: #c8e6c9; /* Pastel verde claro para encabezados */
+    --header-text: #1b5e20;   /* Verde oscuro para texto de encabezados */
+    --row-border: #dddddd;    /* Color sutil para bordes de filas */
+    --row-alternate: #f9fdf9; /* Color muy suave para filas alternas */
 }
 
 body {
@@ -134,6 +138,99 @@ h1 {
     border-bottom: 2px solid var(--primary-green);
 }
 
+/* Estilos mejorados para tablas */
+.table-wrapper {
+    overflow-x: auto;
+    margin-top: 15px;
+    border-radius: 6px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    background-color: var(--white);
+    overflow: hidden;
+}
+
+thead {
+    background-color: var(--header-pastel);
+}
+
+th {
+    padding: 12px 15px;
+    text-align: left;
+    font-weight: bold;
+    color: var(--header-text);
+    border-bottom: 2px solid var(--primary-green);
+    position: relative;
+}
+
+th:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(to right, var(--primary-green), var(--header-pastel));
+    opacity: 0.7;
+}
+
+tbody tr {
+    border-bottom: 1px solid var(--row-border);
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:nth-child(even) {
+    background-color: var(--row-alternate);
+}
+
+tbody tr:hover {
+    background-color: var(--light-green);
+}
+
+td {
+    padding: 10px 15px;
+    vertical-align: top;
+}
+
+/* Estilo para la paginación */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.pagination-container button {
+    padding: 6px 12px;
+    background-color: var(--white);
+    border: 1px solid var(--primary-green);
+    color: var(--primary-green);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-container button:hover:not([disabled]) {
+    background-color: var(--light-green);
+}
+
+.pagination-container button:disabled {
+    background-color: var(--primary-green);
+    color: var(--white);
+    cursor: default;
+}
+
+.pagination-ellipsis {
+    display: inline-block;
+    margin: 0 5px;
+    align-self: center;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .tables-container {
@@ -142,5 +239,9 @@ h1 {
 
     .table-section {
         margin-bottom: 20px;
+    }
+
+    th, td {
+        padding: 8px 10px;
     }
 }
