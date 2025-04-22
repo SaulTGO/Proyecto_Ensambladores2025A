@@ -71,7 +71,8 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 
 		// Crear un scanner para leer línea por línea
 		scanner := bufio.NewScanner(file)
-
+		SourceCode = make(map[int]string)
+		
 		//Guardar cada linea del archivo
 		for i := 1; scanner.Scan(); i++ {
 			//Llenar la variable con las lineas de codigo
@@ -87,6 +88,7 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 		//Una vez hechas las validaciones, despleagar el contenido
 		//tmpl.ExecuteTemplate(w, "display_source_code.html", SourceCode)
 
+		InstructionsSlice = []AsmInstruction{}
 		AnalizeSourceCode(SourceCode)
 
 		//tmpl.ExecuteTemplate(w, "display_parsed_code.html", InstructionsSlice)
