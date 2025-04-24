@@ -8,6 +8,7 @@
     --header-text: #1b5e20;   /* Verde oscuro para texto de encabezados */
     --row-border: #dddddd;    /* Color sutil para bordes de filas */
     --row-alternate: #f9fdf9; /* Color muy suave para filas alternas */
+    --header-shadow: rgba(46, 139, 87, 0.2); /* Sombra para mejorar encabezados */
 }
 
 body {
@@ -25,18 +26,21 @@ body {
     padding: 20px;
 }
 
+/* Mejora de encabezados */
 header {
-    background-color: var(--primary-green);
+    background: linear-gradient(to right, var(--primary-green), var(--dark-green));
     color: var(--white);
-    padding: 20px 0;
+    padding: 25px 0;
     text-align: center;
     margin-bottom: 30px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px var(--header-shadow);
 }
 
 h1 {
     margin: 0;
     font-size: 2.5rem;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .upload-section {
@@ -131,11 +135,15 @@ h1 {
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
+/* Mejora de títulos de tabla */
 .table-title {
-    color: var(--primary-green);
+    color: var(--dark-green);
     margin-top: 0;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     border-bottom: 2px solid var(--primary-green);
+    font-size: 1.3rem;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Estilos mejorados para tablas */
@@ -191,9 +199,30 @@ tbody tr:hover {
     background-color: var(--light-green);
 }
 
-td {
-    padding: 10px 15px;
+/* Mejoras para la tabla de código fuente */
+.table-section:first-child td {
+    padding: 8px 15px;
     vertical-align: top;
+    font-family: 'Consolas', 'Courier New', monospace;
+    white-space: pre;
+    text-wrap: nowrap;
+    overflow-x: visible;
+}
+
+/* Preserva los espacios en blanco y tabulaciones */
+.table-section:first-child table {
+    table-layout: fixed;
+}
+
+/* Asegura que las líneas vacías sean visibles */
+.table-section:first-child td:empty::after {
+    content: '\00a0'; /* Espacio no rompible para líneas vacías */
+    opacity: 0.5;
+}
+
+/* Ajusta el estilo para las líneas de código */
+.table-section:first-child tbody tr {
+    line-height: 1.5;
 }
 
 /* Estilo para la paginación */
