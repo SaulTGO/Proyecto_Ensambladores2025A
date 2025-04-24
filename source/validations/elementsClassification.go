@@ -10,31 +10,34 @@ func CheckConstant(element string) (bool, string) {
 
 	if references.ConstantPtrn.MatchString(element) {
 		base = checkBaseConstant(element)
+		if base == "No valido" {
+			return false, "No valido"
+		}
 		return true, base
 	}
 	return false, ""
-
 }
 
 func checkBaseConstant(element string) string {
-
-	base := ""
-	if references.BaseConstantPtrn.MatchString(element) {
+	if references.StringPtrn.MatchString(element) {
+		if references.EndQuotesPtrn.MatchString(element) {
+			return "Caracter"
+		}
+		return "Bad Quotes"
+	} else if references.BaseConstantPtrn.MatchString(element) {
 		b := references.BaseConstantPtrn.FindString(element)
 
-		if strings.EqualFold(b, "b") {
-			base = "Binario"
-		} else if strings.EqualFold(b, "h") {
-			base = "Hexadecimal"
-		} else if strings.EqualFold(b, "o") {
-			base = "Octal"
+		if strings.EqualFold(b, "b") || strings.EqualFold(b, "B") {
+			return "Binario"
+		} else if strings.EqualFold(b, "h") || strings.EqualFold(b, "H") {
+			return checkHexa(element)
+		} else if strings.EqualFold(b, "o") || strings.EqualFold(b, "O") {
+			return "Octal"
 		} else {
-			base = "Decimal"
+			return "Decimal"
 		}
-	} else if references.StringPtrn.MatchString(element) {
-		base = "Caracter"
 	}
-	return base
+	return ""
 }
 
 func CheckInstruction(element string) (bool, string) {
@@ -87,4 +90,15 @@ func CheckSymbol(element string) (bool, string) {
 		return true, "Simbolo"
 	}
 	return false, ""
+}
+
+func checkHexa(element string) string {
+	if string(element[0]) == "0" {
+		tempString := element[1:]
+		tempString = tempString[:len(tempString)-1]
+		if len(tempString) == 2 || len(tempString) == 4 || len(tempString) == 8 {
+			return "Hexadecimal"
+		}
+	}
+	return "No valido"
 }
