@@ -160,6 +160,7 @@ table {
     border-spacing: 0;
     background-color: var(--white);
     overflow: hidden;
+    table-layout: fixed;
 }
 
 thead {
@@ -189,6 +190,7 @@ th:after {
 tbody tr {
     border-bottom: 1px solid var(--row-border);
     transition: background-color 0.2s ease;
+    line-height: 1.5;
 }
 
 tbody tr:nth-child(even) {
@@ -199,8 +201,8 @@ tbody tr:hover {
     background-color: var(--light-green);
 }
 
-/* Mejoras para la tabla de código fuente */
-.table-section:first-child td {
+/* Estilos comunes para ambas tablas */
+.table-section td {
     padding: 8px 15px;
     vertical-align: top;
     font-family: 'Consolas', 'Courier New', monospace;
@@ -209,20 +211,31 @@ tbody tr:hover {
     overflow-x: visible;
 }
 
-/* Preserva los espacios en blanco y tabulaciones */
-.table-section:first-child table {
-    table-layout: fixed;
-}
-
 /* Asegura que las líneas vacías sean visibles */
-.table-section:first-child td:empty::after {
+.table-section td:empty::after {
     content: '\00a0'; /* Espacio no rompible para líneas vacías */
     opacity: 0.5;
 }
 
-/* Ajusta el estilo para las líneas de código */
-.table-section:first-child tbody tr {
-    line-height: 1.5;
+/* Estilo específico para la tabla de código fuente */
+.table-section:first-child td {
+    /* El estilo específico para código fuente ya está definido en los estilos comunes */
+}
+
+/* Estilo específico para la tabla de separación de elementos */
+.table-section:nth-child(2) table {
+    /* Ajustar columnas para la tabla de separación de elementos */
+    width: 100%;
+}
+
+.table-section:nth-child(2) th:first-child,
+.table-section:nth-child(2) td:first-child {
+    width: 60%;
+}
+
+.table-section:nth-child(2) th:last-child,
+.table-section:nth-child(2) td:last-child {
+    width: 40%;
 }
 
 /* Estilo para la paginación */
