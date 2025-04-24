@@ -37,15 +37,20 @@ func classificateLines(parsedSourceCode map[int]string) {
 func classificateElement(element string, lineNumber string, elementNumber int) AsmInstruction {
 	if isSegment, seg := validations.CheckSegment(element); isSegment {
 		return SetAsmInstruction(element, seg, lineNumber, elementNumber)
+	} else if isPseudoInstruction, psinst := validations.CheckPseudoInstruction(element); isPseudoInstruction {
+		return SetAsmInstruction(element, psinst, lineNumber, elementNumber)
 	} else if isConstant, base := validations.CheckConstant(element); isConstant {
-		tempSlice := []string{"Constante", base}
-		return SetAsmInstruction(element, strings.Join(tempSlice, " "), lineNumber, elementNumber)
+		if base != "Bad Quotes" {
+			tempSlice := []string{"Constante", base}
+			return SetAsmInstruction(element, strings.Join(tempSlice, " "), lineNumber, elementNumber)
+		} else if base == "No valido" {
+			return SetAsmInstruction(element, "No valido", lineNumber, elementNumber)
+		}
+		return SetAsmInstruction(element, "No valido", lineNumber, elementNumber)
 	} else if isInstruction, inst := validations.CheckInstruction(element); isInstruction {
 		return SetAsmInstruction(element, inst, lineNumber, elementNumber)
 	} else if isRegister, reg := validations.CheckRegister(element); isRegister {
 		return SetAsmInstruction(element, reg, lineNumber, elementNumber)
-	} else if isPseudoInstruction, psinst := validations.CheckPseudoInstruction(element); isPseudoInstruction {
-		return SetAsmInstruction(element, psinst, lineNumber, elementNumber)
 	} else if isInvalidInstruction, invInst := validations.CheckInvalidInstruction(element); isInvalidInstruction {
 		return SetAsmInstruction(element, invInst, lineNumber, elementNumber)
 	} else if isSimbol, symbol := validations.CheckSymbol(element); isSimbol {
@@ -56,11 +61,18 @@ func classificateElement(element string, lineNumber string, elementNumber int) A
 }
 
 func splitLine(line string) []string {
-	tempString := ""
+	var tempString string
 	var tempSlice []string
 
-	if references.FullStringPtrn.MatchString(line) {
+	//Check "" & '' patterns
+	if references.DupPtrn.MatchString(line) {
+		tempString = references.DupPtrn.FindAllString(line, -1)[0]
+		line = strings.Replace(line, tempString, "", -1)
+	} else if references.FullStringPtrn.MatchString(line) {
 		tempString = references.FullStringPtrn.FindAllString(line, -1)[0]
+		line = strings.Replace(line, tempString, "", -1)
+	} else if references.BadQuotesPtrn.MatchString(line) {
+		tempString = references.BadQuotesPtrn.FindAllString(line, -1)[0]
 		line = strings.Replace(line, tempString, "", -1)
 	}
 	if references.PseudoElementsPtrn.MatchString(line) {
