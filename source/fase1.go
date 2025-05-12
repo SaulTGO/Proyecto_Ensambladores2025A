@@ -10,9 +10,7 @@ import (
 
 func AnalizeSourceCode(sourceCode map[int]string) {
 	//Remove comments and empty lines
-	ParsedSourceCode := removeComments(sourceCode)
-	ParsedSourceCode = removeEmptyLines(ParsedSourceCode)
-	ParsedSourceCode = removeSpaces(ParsedSourceCode)
+	ParsedSourceCode := ParseSourceCode(sourceCode)
 	classificateLines(ParsedSourceCode)
 }
 
@@ -80,6 +78,8 @@ func splitLine(line string) []string {
 	}
 
 	tempSlice = strings.Split(line, " ")
+	tempSlice = splitByComma(tempSlice)
+
 	for i, element := range tempSlice {
 		tempSlice[i] = strings.TrimSpace(element)
 		tempSlice[i] = strings.TrimSuffix(tempSlice[i], ",")
@@ -147,4 +147,30 @@ func SortKeys(m map[int]string) []int {
 	}
 	sort.Ints(keys)
 	return keys
+}
+
+func ParseSourceCode(sourceCode map[int]string) map[int]string {
+	parsedSourceCode := make(map[int]string)
+
+	parsedSourceCode = removeComments(sourceCode)
+	parsedSourceCode = removeEmptyLines(parsedSourceCode)
+	parsedSourceCode = removeSpaces(parsedSourceCode)
+
+	return parsedSourceCode
+}
+
+func splitByComma(tempSlice []string) []string {
+	var result []string
+	var auxSlice []string
+	for _, str := range tempSlice {
+		auxSlice = strings.Split(str, ",")
+		if len(auxSlice) > 1 {
+			for _, i := range auxSlice {
+				result = append(result, i)
+			}
+		} else {
+			result = append(result, str)
+		}
+	}
+	return result
 }

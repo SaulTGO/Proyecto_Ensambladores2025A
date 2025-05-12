@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"mime/multipart"
 	"net/http"
 )
 
@@ -34,66 +35,106 @@ func ServeFase1(w http.ResponseWriter, r *http.Request) {
 
 // ServeFase2 Ejecutar fase2.html al acceder a /Fase2
 func ServeFase2(w http.ResponseWriter, r *http.Request) {
-	tmpl.ExecuteTemplate(w, "fase2.html", nil)
+	if r.Method == "POST" {
+		handleFileFase2(w, r)
+		return
+	}
+
+	err := tmpl.ExecuteTemplate(w, "fase2.html", SourceCode)
+	if err != nil {
+		return
+	}
 }
 
 // ServeFase3 Ejecutar fase3.html al acceder a /Fase3
 func ServeFase3(w http.ResponseWriter, r *http.Request) {
-	tmpl.ExecuteTemplate(w, "fase3.html", nil)
+	if r.Method == "POST" {
+		handleFileFase3(w, r)
+		return
+	}
+
+	err := tmpl.ExecuteTemplate(w, "fase3.html", nil)
+	if err != nil {
+		return
+	}
 }
 
 // Ejecutar al subir un archivo
 func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		err := r.ParseMultipartForm(10 << 20) //Tamaño maximo
-		if err != nil {
-			http.Error(w, "Error al parsear el formulario: "+err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		// Verificar si existe el archivo
-		files := r.MultipartForm.File["uploaded"]
-		if len(files) == 0 {
-			http.Error(w, "No se encontró el archivo", http.StatusBadRequest)
-			return
-		}
-
-		//Abrir el archivo
-		fileheader := files[0]
-
-		//Abrir el archivo
-		file, err := fileheader.Open()
-		if err != nil {
-			http.Error(w, "Error al abrir el archivo: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		defer file.Close()
-
-		// Crear un scanner para leer línea por línea
-		scanner := bufio.NewScanner(file)
-		SourceCode = make(map[int]string)
-		
-		//Guardar cada linea del archivo
-		for i := 1; scanner.Scan(); i++ {
-			//Llenar la variable con las lineas de codigo
-			SourceCode[i] = scanner.Text()
-		}
-
-		//Verificar que el escaner haga su chamba
-		if err := scanner.Err(); err != nil {
-			http.Error(w, "Error al leer el archivo: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
+		processFile(w, r)
 
 		//Una vez hechas las validaciones, despleagar el contenido
-		//tmpl.ExecuteTemplate(w, "display_source_code.html", SourceCode)
 
 		InstructionsSlice = []AsmInstruction{}
 		AnalizeSourceCode(SourceCode)
 
-		//tmpl.ExecuteTemplate(w, "display_parsed_code.html", InstructionsSlice)
-
 		http.Redirect(w, r, "/Fase1", http.StatusSeeOther)
+		return
+	}
+}
+
+func handleFileFase2(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		processFile(w, r)
+
+		http.Redirect(w, r, "/Fase2", http.StatusSeeOther)
+		return
+	}
+}
+
+func handleFileFase3(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		processFile(w, r)
+
+		http.Redirect(w, r, "/Fase3", http.StatusSeeOther)
+		return
+	}
+}
+
+func processFile(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(10 << 20) //Tamaño maximo
+	if err != nil {
+		http.Error(w, "Error al parsear el formulario: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Verificar si existe el archivo
+	files := r.MultipartForm.File["uploaded"]
+	if len(files) == 0 {
+		http.Error(w, "No se encontró el archivo", http.StatusBadRequest)
+		return
+	}
+
+	//Abrir el archivo
+	fileheader := files[0]
+
+	//Abrir el archivo
+	file, err := fileheader.Open()
+	if err != nil {
+		http.Error(w, "Error al abrir el archivo: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer func(file multipart.File) {
+		err := file.Close()
+		if err != nil {
+
+		}
+	}(file)
+
+	// Crear un scanner para leer línea por línea
+	scanner := bufio.NewScanner(file)
+	SourceCode = make(map[int]string)
+
+	//Guardar cada linea del archivo
+	for i := 1; scanner.Scan(); i++ {
+		//Llenar la variable con las lineas de codigo
+		SourceCode[i] = scanner.Text()
+	}
+
+	//Verificar que el escaner haga su chamba
+	if err := scanner.Err(); err != nil {
+		http.Error(w, "Error al leer el archivo: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
