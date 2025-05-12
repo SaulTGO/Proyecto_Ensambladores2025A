@@ -49,10 +49,9 @@ func CheckInstruction(element string) (bool, string) {
 }
 
 func CheckRegister(element string) (bool, string) {
-	_, found := references.Registers16bits[strings.ToUpper(element)]
-	if found {
-		return true, "Registro"
-	} else if _, found := references.Registers8bits[element]; found {
+	_, fullMatch := references.Registers16bits[strings.ToUpper(element)]
+	_, match := references.Registers8bits[strings.ToUpper(element)]
+	if fullMatch || match {
 		return true, "Registro"
 	}
 	return false, ""
