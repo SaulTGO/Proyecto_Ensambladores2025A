@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fase 2</title>
+</head>
+<body>
+    <h1>Fase 2</h1>
+    <div class="upload-section">
+    <form class="upload-form" enctype="multipart/form-data" method="post" action="/Fase2">
+        <div class="file-input-wrapper">
+            <label class="file-input-label" for="file-upload">
+                Arrastra tu archivo aquí o haz clic para seleccionar
+                <input id="file-upload" class="file-input" type="file" name="uploaded" accept=".*">
+            </label>
+            <div id="file-name" class="file-name">Ningún archivo seleccionado</div>
+        </div>
+        <button class="submit-button" type="submit">Subir archivo</button>
+    </form>
+    </div>
+    <div>
+        {{ range . }}
+        {{ . }}
+        {{ end }}
+    </div>
+</body>
+</html>
