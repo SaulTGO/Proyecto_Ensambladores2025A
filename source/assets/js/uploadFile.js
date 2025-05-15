@@ -1,0 +1,171 @@
+// Función para actualizar el nombre del archivo cuando se selecciona uno
+document.getElementById('file-upload').addEventListener('change', function() {
+    const fileName = this.files[0] ? this.files[0].name : 'Ningún archivo seleccionado';
+    document.getElementById('file-name').textContent = fileName;
+
+    // Guardar el nombre del archivo en localStorage
+    localStorage.setItem('selectedFileName', fileName);
+});
+
+// Al cargar la página, comprobar si hay un nombre de archivo guardado
+document.addEventListener('DOMContentLoaded', function() {
+    const savedFileName = localStorage.getItem('selectedFileName');
+    if (savedFileName) {
+        document.getElementById('file-name').textContent = savedFileName;
+    }
+
+    // Si el formulario se envía, mantener el nombre del archivo
+    document.querySelector('.upload-form').addEventListener('submit', function() {
+        // El nombre ya está guardado en localStorage, se recuperará después de la recarga
+    });
+});
+
+// Soporte para arrastrar y soltar archivos
+const dropZone = document.querySelector('.file-input-label');
+
+dropZone.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    this.style.backgroundColor = 'var(--light-gray)';
+    this.style.borderColor = 'var(--dark-green)';
+});
+
+dropZone.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    this.style.backgroundColor = 'var(--white)';
+    this.style.borderColor = 'var(--primary-green)';
+});
+
+dropZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.style.backgroundColor = 'var(--white)';
+    this.style.borderColor = 'var(--primary-green)';
+
+    const fileInput = document.getElementById('file-upload');
+    if (e.dataTransfer.files.length) {
+        fileInput.files = e.dataTransfer.files;
+        const fileName = fileInput.files[0] ? fileInput.files[0].name : 'Ningún archivo seleccionado';
+        document.getElementById('file-name').textContent = fileName;
+
+        // Disparar evento change para cualquier otro listener
+        const event = new Event('change');
+        fileInput.dispatchEvent(event);
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    function paginateTable(tableIndex, rowsPerPage) {
+        const table = document.querySelectorAll(".table-wrapper table")[tableIndex];
+        if (!table) return;
+
+        const tbody = table.querySelector("tbody");
+        if (!tbody) return;
+
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const paginationContainer = document.createElement("div");
+        paginationContainer.className = "pagination-container";
+        table.parentElement.appendChild(paginationContainer);
+
+        let currentPage = 1;
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        function showPage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            rows.forEach((row, index) => {
+                row.style.display = index >= start && index < end ? "" : "none";
+            });
+        }
+
+        function updatePagination() {
+            paginationContainer.innerHTML = "";
+            if (totalPages <= 1) return;
+
+            const prevButton = document.createElement("button");
+            prevButton.textContent = "Anterior";
+            prevButton.disabled = currentPage === 1;
+            prevButton.onclick = () => {
+                currentPage--;
+                showPage(currentPage);
+                updatePagination();
+            };
+            paginationContainer.appendChild(prevButton);
+
+            // Mostrar solo un rango de páginas si hay muchas
+            const maxVisiblePages = 5;
+            let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+            // Ajustar el rango si llegamos al final
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            if (startPage > 1) {
+                const firstPageBtn = document.createElement("button");
+                firstPageBtn.textContent = "1";
+                firstPageBtn.onclick = () => {
+                    currentPage = 1;
+                    showPage(currentPage);
+                    updatePagination();
+                };
+                paginationContainer.appendChild(firstPageBtn);
+
+                if (startPage > 2) {
+                    const ellipsis = document.createElement("span");
+                    ellipsis.textContent = "...";
+                    ellipsis.className = "pagination-ellipsis";
+                    paginationContainer.appendChild(ellipsis);
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                const btn = document.createElement("button");
+                btn.textContent = i;
+                btn.disabled = i === currentPage;
+                btn.onclick = () => {
+                    currentPage = i;
+                    showPage(currentPage);
+                    updatePagination();
+                };
+                paginationContainer.appendChild(btn);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    const ellipsis = document.createElement("span");
+                    ellipsis.textContent = "...";
+                    ellipsis.style.margin = "0 5px";
+                    paginationContainer.appendChild(ellipsis);
+                }
+
+                const lastPageBtn = document.createElement("button");
+                lastPageBtn.textContent = totalPages;
+                lastPageBtn.onclick = () => {
+                    currentPage = totalPages;
+                    showPage(currentPage);
+                    updatePagination();
+                };
+                paginationContainer.appendChild(lastPageBtn);
+            }
+
+            const nextButton = document.createElement("button");
+            nextButton.textContent = "Siguiente";
+            nextButton.disabled = currentPage === totalPages;
+            nextButton.onclick = () => {
+                currentPage++;
+                showPage(currentPage);
+                updatePagination();
+            };
+            paginationContainer.appendChild(nextButton);
+        }
+
+        showPage(currentPage);
+        updatePagination();
+    }
+
+    // Iniciar paginación después de que se cargue la página
+    setTimeout(() => {
+        paginateTable(0, 10);
+        paginateTable(1, 10);
+    }, 100);
+});
