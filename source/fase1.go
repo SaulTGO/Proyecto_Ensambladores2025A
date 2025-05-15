@@ -4,13 +4,12 @@ import (
 	"Assembler/references"
 	"Assembler/validations"
 	"sort"
-	"strconv"
 	"strings"
 )
 
 func AnalizeSourceCode(sourceCode map[int]string) {
 	//Remove comments and empty lines
-	ParsedSourceCode := ParseSourceCode(sourceCode)
+	ParsedSourceCode = ParseSourceCode(sourceCode)
 	classificateLines(ParsedSourceCode)
 }
 
@@ -26,13 +25,13 @@ func classificateLines(parsedSourceCode map[int]string) {
 
 		for _, element := range elements {
 			*elmNumber = *elmNumber + 1
-			tempInst := classificateElement(element, strconv.Itoa(lineNumber+1), elementNumber)
+			tempInst := classificateElement(element, lineNumber, elementNumber)
 			tempInst.AppendAsmInstruction()
 		}
 	}
 }
 
-func classificateElement(element string, lineNumber string, elementNumber int) AsmInstruction {
+func classificateElement(element string, lineNumber int, elementNumber int) AsmInstruction {
 	if isSegment, seg := validations.CheckSegment(element); isSegment {
 		return SetAsmInstruction(element, seg, lineNumber, elementNumber)
 	} else if isPseudoInstruction, psinst := validations.CheckPseudoInstruction(element); isPseudoInstruction {

@@ -40,7 +40,14 @@ func ServeFase2(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := tmpl.ExecuteTemplate(w, "fase2.html", SourceCode)
+	fase2Data := Fase2Data{
+		SourceCode:    SourceCode,
+		Validations:   LinesValidation,
+		SymbolTable:   SymbolTable,
+		FileProcessed: len(SourceCode) > 0,
+	}
+
+	err := tmpl.ExecuteTemplate(w, "fase2.html", fase2Data)
 	if err != nil {
 		return
 	}
@@ -77,6 +84,17 @@ func handleUploadFile(w http.ResponseWriter, r *http.Request) {
 func handleFileFase2(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		processFile(w, r)
+
+		InstructionsSlice = []AsmInstruction{}
+		AnalizeSourceCode(SourceCode)
+
+		StackLines = make(map[int]string)
+		CodeLines = make(map[int]string)
+		DataLines = make(map[int]string)
+
+		SymbolTable = []Symbol{}
+		LinesValidation = []LineStatus{}
+		SemanticAnalysis()
 
 		http.Redirect(w, r, "/Fase2", http.StatusSeeOther)
 		return
@@ -127,7 +145,7 @@ func processFile(w http.ResponseWriter, r *http.Request) {
 	SourceCode = make(map[int]string)
 
 	//Guardar cada linea del archivo
-	for i := 1; scanner.Scan(); i++ {
+	for i := 0; scanner.Scan(); i++ {
 		//Llenar la variable con las lineas de codigo
 		SourceCode[i] = scanner.Text()
 	}
