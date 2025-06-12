@@ -5,39 +5,44 @@ import (
 	"strings"
 )
 
-func CheckConstant(element string) (bool, string) {
-	base := ""
-
-	if references.ConstantPtrn.MatchString(element) {
-		base = checkBaseConstant(element)
-		if base == "No valido" {
-			return false, "No valido"
-		}
-		return true, base
+func CheckConstant(element string) (bool, string, string) {
+	if !references.ConstantPtrn.MatchString(element) {
+		return false, "", ""
 	}
-	return false, ""
+
+	base, err := checkBaseConstant(element)
+	if base == "No valido" || base == "Bad Quotes" {
+		return true, base, err
+	}
+
+	return true, base, ""
 }
 
-func checkBaseConstant(element string) string {
+func checkBaseConstant(element string) (string, string) {
+
 	if references.StringPtrn.MatchString(element) {
 		if references.EndQuotesPtrn.MatchString(element) {
-			return "Caracter"
+			return "Caracter", ""
 		}
-		return "Bad Quotes"
-	} else if references.BaseConstantPtrn.MatchString(element) {
+		return "Bad Quotes", "Cadena mal declarada"
+	}
+
+	if references.BaseConstantPtrn.MatchString(element) {
 		b := references.BaseConstantPtrn.FindString(element)
 
-		if strings.EqualFold(b, "b") || strings.EqualFold(b, "B") {
-			return "Binario"
-		} else if strings.EqualFold(b, "h") || strings.EqualFold(b, "H") {
+		switch strings.ToUpper(b) {
+		case "B":
+			return checkBinary(element)
+		case "H":
 			return checkHexa(element)
-		} else if strings.EqualFold(b, "o") || strings.EqualFold(b, "O") {
-			return "Octal"
-		} else {
-			return "Decimal"
+		case "O":
+			return "Octal", ""
+		default:
+			return "Decimal", ""
 		}
 	}
-	return ""
+
+	return "No valido", "Constante no reconocida"
 }
 
 func CheckInstruction(element string) (bool, string) {
@@ -91,13 +96,31 @@ func CheckSymbol(element string) (bool, string) {
 	return false, ""
 }
 
-func checkHexa(element string) string {
+func checkBinary(element string) (string, string) {
+	lastChar := string(element[len(element)-1])
+	if lastChar == "b" || lastChar == "B" {
+		tempString := element[:len(element)-1]
+		if len(tempString) == 8 || len(tempString) == 16 {
+			return "Binario", ""
+		}
+		return "No valido", "Longitud incorrecta (1 o 2 bytes)"
+	}
+	return "No valido", "Formato binario incorrecto"
+}
+
+func checkHexa(element string) (string, string) {
+
 	if string(element[0]) == "0" {
 		tempString := element[1:]
 		tempString = tempString[:len(tempString)-1]
-		if len(tempString) == 2 || len(tempString) == 4 || len(tempString) == 8 {
-			return "Hexadecimal"
+
+		validLengths := []int{2, 4, 8}
+		for _, length := range validLengths {
+			if len(tempString) == length {
+				return "Hexadecimal", ""
+			}
 		}
+		return "No valido", "Longitud incorrecta (1 o 2 bytes)"
 	}
-	return "No valido"
+	return "No valido", "Formato incorrecto (debe iniciar con 0)"
 }

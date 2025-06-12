@@ -1,6 +1,6 @@
 package validations
 
-// ValidateStackLine Return the Status and the error (if exists)
+// ValidateStackLine Return the Status and the error (if exists) using ONLY the classification
 func ValidateStackLine(elementsClasif []string) (bool, string) {
 
 	if len(elementsClasif) == 1 {
@@ -15,13 +15,13 @@ func ValidateStackLine(elementsClasif []string) (bool, string) {
 				if elementsClasif[2] == "PseudoInstruccion" {
 					return true, ""
 				} else {
-					return false, "DUP mal declarado"
+					return false, "Sintaxis incorrecta. (Ej: DB 10 DUP(0)"
 				}
 			} else {
-				return false, "Inconsistencia despues de db/dw"
+				return false, "Sintaxis incorrecta. (Ej: DB 10 DUP(0)"
 			}
 		} else {
-			return false, "Falta PseudoInstruccion db/dw"
+			return false, "Sintaxis incorrecta. (Ej: DB 10 DUP(0)"
 		}
 	}
 	return false, ""
@@ -35,21 +35,42 @@ func ValidateDataLine(elementsClasif []string) (bool, string) {
 		}
 	}
 
-	if len(elementsClasif) != 3 {
-		return false, "Numero invalido de elementos"
+	// Check var declaration
+	if len(elementsClasif) == 3 {
+		if elementsClasif[0] == "Simbolo" {
+			if elementsClasif[1] == "PseudoInstruccion" {
+				if isValidConstant(elementsClasif[2]) {
+					return true, ""
+				}
+			}
+		}
 	}
 
-	if elementsClasif[0] == "Simbolo" {
-		if elementsClasif[1] == "PseudoInstruccion" {
-			if isValidConstant(elementsClasif[2]) {
+	//Check multiple var values
+	if len(elementsClasif) >= 4 {
+		if elementsClasif[0] == "Simbolo" {
+			if elementsClasif[1] == "PseudoInstruccion" {
+				// Check if every constant is valid
+				for _, element := range elementsClasif[2:] {
+					if isValidConstant(element) {
+						continue
+					} else {
+						return false, "Constante no valida"
+					}
+				}
 				return true, ""
 			}
 		}
 	}
+
 	return false, ""
 }
 
 func ValidateCodeLine(elementsClasif []string) (bool, string) {
+	if len(elementsClasif) == 0 {
+		return false, ""
+	}
+
 	if elementsClasif[0] == "No valido" {
 		return false, "Instruccion invalida"
 	}
@@ -91,7 +112,7 @@ func ValidateCodeLine(elementsClasif []string) (bool, string) {
 	return false, ""
 }
 
-var validConstants = []string{"Constante Decimal", "Constante Hexadecimal", "Constante Caracter", "Constante Octal"}
+var validConstants = []string{"Constante Decimal", "Constante Hexadecimal", "Constante Caracter", "Constante Octal", "Constante Binario"}
 
 func isValidConstant(element string) bool {
 	for _, valid := range validConstants {
