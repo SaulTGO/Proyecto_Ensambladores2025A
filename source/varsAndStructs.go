@@ -10,19 +10,19 @@ type AsmInstruction struct {
 	Name           string
 	Classification string
 	LineNumber     int
-	ElementNumber  int
+	Error          string
 }
 
 func (asmInst AsmInstruction) AppendAsmInstruction() {
 	InstructionsSlice = append(InstructionsSlice, asmInst)
 }
 
-func SetAsmInstruction(name string, classification string, numberLine int, elementNumber int) AsmInstruction {
+func SetAsmInstruction(name string, classification string, numberLine int, error string) AsmInstruction {
 	tempInst := AsmInstruction{
 		Name:           name,
 		Classification: classification,
 		LineNumber:     numberLine,
-		ElementNumber:  elementNumber,
+		Error:          error,
 	}
 
 	return tempInst
@@ -36,9 +36,9 @@ type Data struct {
 
 // Fase 2
 
-var StackLines = make(map[int]string)
-var CodeLines = make(map[int]string)
-var DataLines = make(map[int]string)
+//var StackLines = make(map[int]string)
+//var CodeLines = make(map[int]string)
+//var DataLines = make(map[int]string)
 
 type ProgramSegments struct {
 	StackLines map[int]string

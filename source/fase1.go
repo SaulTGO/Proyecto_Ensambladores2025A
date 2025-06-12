@@ -15,8 +15,6 @@ func AnalizeSourceCode(sourceCode map[int]string) {
 
 func classificateLines(parsedSourceCode map[int]string) {
 	sortedKeys := SortKeys(parsedSourceCode)
-	elementNumber := 0
-	var elmNumber *int = &elementNumber
 
 	for _, k := range sortedKeys {
 		line := parsedSourceCode[k]
@@ -24,37 +22,39 @@ func classificateLines(parsedSourceCode map[int]string) {
 		elements := splitLine(line)
 
 		for _, element := range elements {
-			*elmNumber = *elmNumber + 1
-			tempInst := classificateElement(element, lineNumber, elementNumber)
+			tempInst := classificateElement(element, lineNumber)
 			tempInst.AppendAsmInstruction()
 		}
 	}
 }
 
-func classificateElement(element string, lineNumber int, elementNumber int) AsmInstruction {
+func classificateElement(element string, lineNumber int) AsmInstruction {
+	nilErr := ""
 	if isSegment, seg := validations.CheckSegment(element); isSegment {
-		return SetAsmInstruction(element, seg, lineNumber, elementNumber)
+		return SetAsmInstruction(element, seg, lineNumber, nilErr)
 	} else if isPseudoInstruction, psinst := validations.CheckPseudoInstruction(element); isPseudoInstruction {
-		return SetAsmInstruction(element, psinst, lineNumber, elementNumber)
-	} else if isConstant, base := validations.CheckConstant(element); isConstant {
-		if base != "Bad Quotes" {
+		return SetAsmInstruction(element, psinst, lineNumber, nilErr)
+	} else if isConstant, base, err := validations.CheckConstant(element); isConstant {
+		switch base {
+		case "Bad Quotes":
+			return SetAsmInstruction(element, "No valido", lineNumber, "Cadena mal declarada")
+		case "No valido":
+			return SetAsmInstruction(element, "No valido", lineNumber, err)
+		default:
 			tempSlice := []string{"Constante", base}
-			return SetAsmInstruction(element, strings.Join(tempSlice, " "), lineNumber, elementNumber)
-		} else if base == "No valido" {
-			return SetAsmInstruction(element, "No valido", lineNumber, elementNumber)
+			return SetAsmInstruction(element, strings.Join(tempSlice, " "), lineNumber, nilErr)
 		}
-		return SetAsmInstruction(element, "No valido", lineNumber, elementNumber)
 	} else if isInstruction, inst := validations.CheckInstruction(element); isInstruction {
-		return SetAsmInstruction(element, inst, lineNumber, elementNumber)
+		return SetAsmInstruction(element, inst, lineNumber, nilErr)
 	} else if isRegister, reg := validations.CheckRegister(element); isRegister {
-		return SetAsmInstruction(element, reg, lineNumber, elementNumber)
+		return SetAsmInstruction(element, reg, lineNumber, nilErr)
 	} else if isInvalidInstruction, invInst := validations.CheckInvalidInstruction(element); isInvalidInstruction {
-		return SetAsmInstruction(element, invInst, lineNumber, elementNumber)
+		return SetAsmInstruction(element, invInst, lineNumber, "Instruccion no valida")
 	} else if isSimbol, symbol := validations.CheckSymbol(element); isSimbol {
-		return SetAsmInstruction(element, symbol, lineNumber, elementNumber)
+		return SetAsmInstruction(element, symbol, lineNumber, nilErr)
 	}
-	return SetAsmInstruction(element, "No valido", lineNumber, elementNumber)
 
+	return SetAsmInstruction(element, "No valido", lineNumber, "Elemento no reconocido")
 }
 
 func splitLine(line string) []string {
@@ -112,8 +112,8 @@ func removeSpaces(sourceCode map[int]string) map[int]string {
 func removeEmptyLines(sourceCode map[int]string) map[int]string {
 	var r = make(map[int]string)
 	for i, str := range sourceCode {
-		if str != "" {
-			r[i+1] = str
+		if strings.TrimSpace(str) != "" {
+			r[i] = str
 		}
 	}
 	return r

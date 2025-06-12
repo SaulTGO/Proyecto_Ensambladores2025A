@@ -88,9 +88,11 @@ func handleFileFase2(w http.ResponseWriter, r *http.Request) {
 		InstructionsSlice = []AsmInstruction{}
 		AnalizeSourceCode(SourceCode)
 
-		StackLines = make(map[int]string)
-		CodeLines = make(map[int]string)
-		DataLines = make(map[int]string)
+		//StackLines = make(map[int]string)
+		//CodeLines = make(map[int]string)
+		//DataLines = make(map[int]string)
+
+		Segments = ProgramSegments{}
 
 		SymbolTable = []Symbol{}
 		LinesValidation = []LineStatus{}
@@ -147,7 +149,7 @@ func processFile(w http.ResponseWriter, r *http.Request) {
 	//Guardar cada linea del archivo
 	for i := 0; scanner.Scan(); i++ {
 		//Llenar la variable con las lineas de codigo
-		SourceCode[i] = scanner.Text()
+		SourceCode[i+1] = scanner.Text()
 	}
 
 	//Verificar que el escaner haga su chamba
