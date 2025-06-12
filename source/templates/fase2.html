@@ -2,9 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/assets/css/fase2.css">
+    <script src="/assets/js/uploadFile.js" defer></script>
     <title>Fase 2</title>
 </head>
 <body>
+<header>
     <h1>Fase 2</h1>
+</header>
+
+<div class="container">
+    <div class="upload-section">
+        <form class="upload-form" enctype="multipart/form-data" method="post" action="/Fase2">
+            <div class="file-input-wrapper">
+                <label class="file-input-label" for="file-upload">
+                    Arrastra tu archivo aquí o haz clic para seleccionar
+                    <input id="file-upload" class="file-input" type="file" name="uploaded" accept=".*">
+                </label>
+                <div id="file-name" class="file-name">Ningún archivo seleccionado</div>
+            </div>
+            <button class="submit-button" type="submit">Subir archivo</button>
+        </form>
+    </div>
+
+    {{if .FileProcessed}}
+    <div class="tables-container">
+        <!-- Contenedor para las tablas de código fuente y validaciones -->
+        <div class="side-by-side-tables">
+            <div class="table-section source-code">
+                <h3 class="table-title">Código fuente</h3>
+                <div class="table-wrapper">
+                    <table class="code-table">
+                        <thead>
+                        <tr>
+                            <th>Línea</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{ range $skip, $line := .SourceCode }}
+                        <tr>
+                            <td class="source-code-cell">{{ $line }}</td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="table-section validations">
+                <h3 class="table-title">Validacion de lineas</h3>
+                <div class="table-wrapper">
+                    <table class="validation-table">
+                        <thead>
+                        <tr>
+                            <th class="line-column">Linea</th>
+                            <th class="status-column">Validacion</th>
+                            <th class="error-column">Error</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {{range .Validations}}
+                        <tr>
+                            <td class="line-cell">{{ .Line }}</td>
+                            <td class="status-cell">{{ .Status }}</td>
+                            <td class="error-cell">{{ .Error }}</td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-section symbols">
+            <h3 class="table-title">Tabla de simbolos</h3>
+            <div class="table-wrapper">
+                <table class="symbol-table">
+                    <thead>
+                    <tr>
+                        <th>Simbolo</th>
+                        <th>Tipo</th>
+                        <th>Valor</th>
+                        <th>Tamaño</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{ range .SymbolTable }}
+                    <tr>
+                        <td>{{ .Name }}</td>
+                        <td>{{ .Kind }}</td>
+                        <td>{{ .Value }}</td>
+                        <td>{{ .Size }}</td>
+                    </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+    {{end}}
+</div>
 </body>
 </html>
