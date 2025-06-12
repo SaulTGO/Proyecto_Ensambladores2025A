@@ -12,7 +12,13 @@ var SymbolPtrn = regexp.MustCompile(`^\w\D`)
 var BadQuotesPtrn = regexp.MustCompile(`"[^"\n]*(?:$|[^"]+$)`)
 var EndQuotesPtrn = regexp.MustCompile(`"$|'$`)
 
-/* Segment Patterns */
-var CodeSegmentPtrn = regexp.MustCompile(`(?i)(code segment)|(\.code segment)|(\.code)`)
-var StackSegmentPtrn = regexp.MustCompile(`(?i)(stack segment)|(\.stack segment)|(\.stack)`)
-var DataSegmentPtrn = regexp.MustCompile(`(?i)(data segment)|(\.data segment)|(\.data)`)
+//var QuestionMark = regexp.MustCompile(`^\?$`)
+
+// Segment Patterns
+var CodeSegmentPtrn = regexp.MustCompile(`(?i)^((code segment)|(\.code segment)|(\.code))$`)
+var StackSegmentPtrn = regexp.MustCompile(`(?i)^((stack segment)|(\.stack segment)|(\.stack))$`)
+var DataSegmentPtrn = regexp.MustCompile(`(?i)^((data segment)|(\.data segment)|(\.data))$`)
+
+var BadStackSegmentPtrn = regexp.MustCompile(`(?i)(stack segment)|(\.stack segment)|(\.stack)`)
+var BadCodeSegmentPtrn = regexp.MustCompile(`(?i)(stack segment)|(\.stack segment)|(\.stack)`)
+var BadDataSegmentPtrn = regexp.MustCompile(`(?i)(data segment)|(\.data segment)|(\.data)`)
